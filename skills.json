@@ -1,0 +1,18 @@
+{
+  "skills": [
+    {
+      "name": "brainstorming",
+      "path": "brainstorming",
+      "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+      "tags": ["brainstorming", "design", "requirements", "planning"],
+      "version": "1.0.0"
+    },
+    {
+      "name": "bun-file-io",
+      "path": "bun-file-io",
+      "description": "Use this when you are working on file operations like reading, writing, scanning, or deleting files. It summarizes preferred file APIs and patterns used in this repo. It also notes when to use filesystem helpers for directories.",
+      "tags": ["file-io", "bun", "filesystem", "file-operations"],
+      "version": "1.0.0"
+    }
+  ]
+}
