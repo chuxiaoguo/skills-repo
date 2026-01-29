@@ -1,0 +1,24 @@
+{
+  "name": "skills-repo",
+  "version": "1.0.0",
+  "description": "AI Agent Skills Repository",
+  "type": "module",
+  "scripts": {
+    "skills:sync": "node scripts/sync-skills.js",
+    "skills:sync:names": "node scripts/sync-skills.js --mode names",
+    "skills:sync:batch": "node scripts/sync-skills.js --mode batch",
+    "skills:merge": "node scripts/merge-skills.js",
+    "skills:merge:verbose": "node scripts/merge-skills.js --verbose"
+  },
+  "keywords": [
+    "skills",
+    "ai-agent",
+    "claude"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "gray-matter": "^4.0.3",
+    "jszip": "^3.10.1"
+  }
+}

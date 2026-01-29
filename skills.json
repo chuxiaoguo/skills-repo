@@ -1,18 +1,63 @@
 {
+  "meta": {
+    "generatedAt": "2026-01-29T12:40:15.328Z",
+    "total": 5
+  },
   "skills": [
     {
-      "name": "brainstorming",
-      "path": "brainstorming",
-      "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
-      "tags": ["brainstorming", "design", "requirements", "planning"],
-      "version": "1.0.0"
+      "name": "cache-components",
+      "path": "cache-components",
+      "description": "Expert guidance for Next.js Cache Components and Partial Prerendering (PPR).\n\n**PROACTIVE ACTIVATION**: Use this skill automatically when working in Next.js projects that have `cacheComponents: true` in their next.config.ts/next.config.js. When this config is detected, proactively apply Cache Components patterns and best practices to all React Server Component implementations.\n\n**DETECTION**: At the start of a session in a Next.js project, check for `cacheComponents: true` in next.config. If enabled, this skill's patterns should guide all component authoring, data fetching, and caching decisions.\n\n**USE CASES**: Implementing 'use cache' directive, configuring cache lifetimes with cacheLife(), tagging cached data with cacheTag(), invalidating caches with updateTag()/revalidateTag(), optimizing static vs dynamic content boundaries, debugging cache issues, and reviewing Cache Component implementations.",
+      "tags": [],
+      "version": "1.0.0",
+      "author": "vercel",
+      "sourceUrl": "https://github.com/vercel/next.js/tree/canary/.claude-plugin/plugins/cache-components/skills/cache-components",
+      "stars": 137379,
+      "updatedAt": "2026-01-29T12:12:59.124Z"
     },
     {
-      "name": "bun-file-io",
-      "path": "bun-file-io",
-      "description": "Use this when you are working on file operations like reading, writing, scanning, or deleting files. It summarizes preferred file APIs and patterns used in this repo. It also notes when to use filesystem helpers for directories.",
-      "tags": ["file-io", "bun", "filesystem", "file-operations"],
-      "version": "1.0.0"
+      "name": "skill-creator",
+      "path": "skill-creator",
+      "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Gemini CLI's capabilities with specialized knowledge, workflows, or tool integrations.",
+      "tags": [],
+      "version": "1.0.0",
+      "author": "google-gemini",
+      "sourceUrl": "https://github.com/google-gemini/gemini-cli/tree/main/packages/core/src/skills/builtin/skill-creator",
+      "stars": 92879,
+      "updatedAt": "2026-01-29T12:40:15.314Z"
+    },
+    {
+      "name": "skill-lookup",
+      "path": "skill-lookup",
+      "description": "Activates when the user asks about Agent Skills, wants to find reusable AI capabilities, needs to install skills, or mentions skills for Claude. Use for discovering, retrieving, and installing skills.",
+      "tags": [],
+      "version": "1.0.0",
+      "author": "f",
+      "sourceUrl": "https://github.com/f/awesome-chatgpt-prompts/tree/main/plugins/claude/prompts.chat/skills/skill-lookup",
+      "stars": 143926,
+      "updatedAt": "2026-01-29T12:11:39.382Z"
+    },
+    {
+      "name": "skill-writer",
+      "path": "skill-writer",
+      "description": "Guide users through creating Agent Skills for Claude Code. Use when the user wants to create, write, author, or design a new Skill, or needs help with SKILL.md files, frontmatter, or skill structure.",
+      "tags": [],
+      "version": "1.0.0",
+      "author": "pytorch",
+      "sourceUrl": "https://github.com/pytorch/pytorch/tree/main/.claude/skills/skill-writer",
+      "stars": 97025,
+      "updatedAt": "2026-01-29T12:40:14.758Z"
+    },
+    {
+      "name": "update-docs",
+      "path": "update-docs",
+      "description": "This skill should be used when the user asks to \"update documentation for my changes\", \"check docs for this PR\", \"what docs need updating\", \"sync docs with code\", \"scaffold docs for this feature\", \"document this feature\", \"review docs completeness\", \"add docs for this change\", \"what documentation is affected\", \"docs impact\", or mentions \"docs/\", \"docs/01-app\", \"docs/02-pages\", \"MDX\", \"documentation update\", \"API reference\", \".mdx files\". Provides guided workflow for updating Next.js documentation based on code changes.",
+      "tags": [],
+      "version": "1.0.0",
+      "author": "vercel",
+      "sourceUrl": "https://github.com/vercel/next.js/tree/canary/.claude/skills/update-docs",
+      "stars": 137379,
+      "updatedAt": "2026-01-29T12:40:14.152Z"
     }
   ]
 }
