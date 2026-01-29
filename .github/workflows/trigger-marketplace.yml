@@ -1,0 +1,26 @@
+name: Trigger Marketplace Update
+
+on:
+  push:
+    branches: [master, main]
+
+jobs:
+  trigger-marketplace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Marketplace Workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.MARKETPLACE_PAT }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: 'chuxiaoguo',
+              repo: 'pa-skills-maketplace',
+              event_type: 'skills-updated',
+              client_payload: {
+                sha: context.sha,
+                ref: context.ref,
+                message: context.payload.head_commit?.message || 'Skills updated'
+              }
+            });
+            console.log('Marketplace workflow triggered successfully');
