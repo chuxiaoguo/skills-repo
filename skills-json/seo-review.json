@@ -1,0 +1,30 @@
+{
+  "name": "seo-review",
+  "path": "seo-review",
+  "description": "Perform a focused SEO audit on JavaScript concept pages to maximize search visibility, featured snippet optimization, and ranking potential",
+  "tags": [
+    "database",
+    "testing",
+    "performance",
+    "skills",
+    "cli",
+    "code-generation",
+    "writing",
+    "search",
+    "discovery",
+    "documentation",
+    "dx",
+    "mdx",
+    "filesystem",
+    "io",
+    "components",
+    "frontend",
+    "automation",
+    "maintenance"
+  ],
+  "version": "1.0.0",
+  "author": "leonardomso",
+  "sourceUrl": "https://github.com/leonardomso/33-js-concepts/tree/master/.claude/skills/seo-review",
+  "stars": 66207,
+  "updatedAt": "2026-01-29T17:00:33.616Z"
+}

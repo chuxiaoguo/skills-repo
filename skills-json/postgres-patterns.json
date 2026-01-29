@@ -1,0 +1,27 @@
+{
+  "name": "postgres-patterns",
+  "path": "postgres-patterns",
+  "description": "PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.",
+  "tags": [
+    "backend",
+    "database",
+    "sql",
+    "git",
+    "github",
+    "api",
+    "security",
+    "authentication",
+    "skills",
+    "cli",
+    "code-generation",
+    "search",
+    "discovery",
+    "automation",
+    "maintenance"
+  ],
+  "version": "1.0.0",
+  "author": "affaan-m",
+  "sourceUrl": "https://github.com/affaan-m/everything-claude-code/tree/main/skills/postgres-patterns",
+  "stars": 33784,
+  "updatedAt": "2026-01-29T17:00:36.121Z"
+}

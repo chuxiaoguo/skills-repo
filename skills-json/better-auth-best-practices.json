@@ -1,0 +1,31 @@
+{
+  "name": "better-auth-best-practices",
+  "path": "better-auth-best-practices",
+  "description": "Skill for integrating Better Auth - the comprehensive TypeScript authentication framework.",
+  "tags": [
+    "frontend",
+    "react",
+    "vue",
+    "database",
+    "git",
+    "github",
+    "api",
+    "security",
+    "authentication",
+    "caching",
+    "performance",
+    "cli",
+    "code-generation",
+    "documentation",
+    "dx",
+    "filesystem",
+    "io",
+    "bun",
+    "runtime"
+  ],
+  "version": "1.0.0",
+  "author": "novuhq",
+  "sourceUrl": "https://github.com/novuhq/novu/tree/next/.claude/skills/better-auth-best-practices",
+  "stars": 38490,
+  "updatedAt": "2026-01-29T17:01:31.052Z"
+}

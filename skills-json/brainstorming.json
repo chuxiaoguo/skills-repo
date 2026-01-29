@@ -1,0 +1,23 @@
+{
+  "name": "brainstorming",
+  "path": "brainstorming",
+  "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+  "tags": [
+    "testing",
+    "git",
+    "version-control",
+    "design",
+    "skills",
+    "cli",
+    "code-generation",
+    "writing",
+    "documentation",
+    "dx",
+    "planning"
+  ],
+  "version": "1.0.0",
+  "author": "obra",
+  "sourceUrl": "https://github.com/obra/superpowers/tree/main/skills/brainstorming",
+  "stars": 39100,
+  "updatedAt": "2026-01-29T17:01:33.452Z"
+}

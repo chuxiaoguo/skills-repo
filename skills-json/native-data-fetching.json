@@ -1,0 +1,25 @@
+{
+  "name": "native-data-fetching",
+  "path": "native-data-fetching",
+  "description": "Use when implementing or debugging ANY network request, API call, or data fetching. Covers fetch API, axios, React Query, SWR, error handling, caching strategies, offline support.",
+  "tags": [
+    "frontend",
+    "react",
+    "database",
+    "api",
+    "security",
+    "authentication",
+    "performance",
+    "skills",
+    "cli",
+    "code-generation",
+    "writing",
+    "automation",
+    "maintenance"
+  ],
+  "version": "1.0.0",
+  "author": "expo",
+  "sourceUrl": "https://github.com/expo/skills/tree/main/plugins/expo-app-design/skills/native-data-fetching",
+  "stars": 763,
+  "updatedAt": "2026-01-29T17:01:37.916Z"
+}

@@ -7,6 +7,7 @@
     "skills:sync": "node scripts/sync-skills.js",
     "skills:sync:names": "node scripts/sync-skills.js --mode names",
     "skills:sync:batch": "node scripts/sync-skills.js --mode batch",
+    "skills:sync:config": "node scripts/sync-config-skills.js",
     "skills:merge": "node scripts/merge-skills.js",
     "skills:merge:verbose": "node scripts/merge-skills.js --verbose"
   },

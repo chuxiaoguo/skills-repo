@@ -62,9 +62,10 @@ export class SyncController {
         if (features.sourceUrl) {
           const githubContent = await fetchGithubContent(features);
           if (githubContent) {
-            apiData.content = githubContent;
+            apiData.content = githubContent.skillMd;
+            apiData.files = githubContent.files;
             // 从 GitHub 内容提取更详细的特征
-            const extractedFeatures = this.extractor.extract(githubContent);
+            const extractedFeatures = this.extractor.extract(githubContent.skillMd);
             features.description = features.description || extractedFeatures.description;
             features.tags = features.tags.length > 0 ? features.tags : extractedFeatures.tags;
           }
@@ -121,8 +122,9 @@ export class SyncController {
         if (features.sourceUrl) {
           const githubContent = await fetchGithubContent(features);
           if (githubContent) {
-            skill.content = githubContent;
-            const extractedFeatures = this.extractor.extract(githubContent);
+            skill.content = githubContent.skillMd;
+            skill.files = githubContent.files;
+            const extractedFeatures = this.extractor.extract(githubContent.skillMd);
             features.description = features.description || extractedFeatures.description;
             features.tags = features.tags.length > 0 ? features.tags : extractedFeatures.tags;
           }

@@ -1,0 +1,16 @@
+{
+  "name": "playwright-cli",
+  "path": "playwright-cli",
+  "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information from web pages.",
+  "tags": [
+    "testing",
+    "cli",
+    "search",
+    "discovery"
+  ],
+  "version": "1.0.0",
+  "author": "microsoft",
+  "sourceUrl": "https://github.com/microsoft/playwright/tree/main/packages/playwright/src/mcp/terminal",
+  "stars": 81819,
+  "updatedAt": "2026-01-29T17:01:27.600Z"
+}

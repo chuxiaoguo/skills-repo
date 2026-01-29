@@ -1,0 +1,11 @@
+{
+  "name": "nano-pdf",
+  "path": "nano-pdf",
+  "description": "Edit PDFs with natural-language instructions using the nano-pdf CLI.",
+  "tags": [],
+  "version": "1.0.0",
+  "author": "moltbot",
+  "sourceUrl": "https://github.com/moltbot/moltbot/tree/main/skills/nano-pdf",
+  "stars": 90628,
+  "updatedAt": "2026-01-29T17:01:32.541Z"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "competitor-alternatives",
+  "path": "competitor-alternatives",
+  "description": "When the user wants to create competitor comparison or alternative pages for SEO and sales enablement. Also use when the user mentions 'alternative page,' 'vs page,' 'competitor comparison,' 'comparison page,' '[Product] vs [Product],' '[Product] alternative,' or 'competitive landing pages.' Covers four formats: singular alternative, plural alternatives, you vs competitor, and competitor vs competitor. Emphasizes deep research, modular content architecture, and varied section types beyond feature tables.",
+  "tags": [
+    "design",
+    "ux",
+    "api",
+    "security",
+    "code-generation",
+    "writing",
+    "search",
+    "discovery",
+    "documentation",
+    "dx",
+    "planning",
+    "filesystem",
+    "io",
+    "automation",
+    "maintenance"
+  ],
+  "version": "1.0.0",
+  "author": "davila7",
+  "sourceUrl": "https://github.com/davila7/claude-code-templates/tree/main/cli-tool/components/skills/business-marketing/competitor-alternatives",
+  "stars": 18778,
+  "updatedAt": "2026-01-29T17:02:06.441Z"
+}

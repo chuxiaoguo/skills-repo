@@ -1,0 +1,17 @@
+{
+  "name": "remotion-best-practices",
+  "path": "remotion-best-practices",
+  "description": "Best practices for Remotion - Video creation in React",
+  "tags": [
+    "frontend",
+    "react",
+    "filesystem",
+    "io",
+    "components"
+  ],
+  "version": "1.0.0",
+  "author": "remotion-dev",
+  "sourceUrl": "https://github.com/remotion-dev/remotion/tree/main/packages/skills/skills/remotion",
+  "stars": 33350,
+  "updatedAt": "2026-01-29T17:00:09.807Z"
+}

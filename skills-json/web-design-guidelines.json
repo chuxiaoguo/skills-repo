@@ -1,0 +1,14 @@
+{
+  "name": "web-design-guidelines",
+  "path": "web-design-guidelines",
+  "description": "Review UI code for Web Interface Guidelines compliance. Use when asked to \"review my UI\", \"check accessibility\", \"audit design\", \"review UX\", or \"check my site against best practices\".",
+  "tags": [
+    "filesystem",
+    "io"
+  ],
+  "version": "1.0.0",
+  "author": "calcom",
+  "sourceUrl": "https://github.com/calcom/cal.com/tree/main/.claude/skills/web-design-guidelines",
+  "stars": 39914,
+  "updatedAt": "2026-01-29T16:59:55.655Z"
+}

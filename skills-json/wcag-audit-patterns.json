@@ -1,0 +1,19 @@
+{
+  "name": "wcag-audit-patterns",
+  "path": "wcag-audit-patterns",
+  "description": "Conduct WCAG 2.2 accessibility audits with automated testing, manual verification, and remediation guidance. Use when auditing websites for accessibility, fixing WCAG violations, or implementing accessible design patterns.",
+  "tags": [
+    "testing",
+    "design",
+    "ui",
+    "skills",
+    "cli",
+    "components",
+    "frontend"
+  ],
+  "version": "1.0.0",
+  "author": "wshobson",
+  "sourceUrl": "https://github.com/wshobson/agents/tree/main/plugins/accessibility-compliance/skills/wcag-audit-patterns",
+  "stars": 27168,
+  "updatedAt": "2026-01-29T17:00:34.940Z"
+}

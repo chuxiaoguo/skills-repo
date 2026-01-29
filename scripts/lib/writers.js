@@ -4,7 +4,6 @@
  */
 import fs from 'fs/promises';
 import path from 'path';
-import matter from 'gray-matter';
 
 export class OutputWriter {
   constructor(config) {
@@ -102,14 +101,23 @@ export class OutputWriter {
     // 确保目录存在
     await this.ensureDir(this.skillsDir);
 
-    // 构建 SKILL.md 内容
-    const skillMdContent = this.buildSkillMd(features, skillData.content || '');
-
-    // 写入 SKILL.md
+    // 写入 SKILL.md（保持原始内容，不添加 frontmatter）
     const skillDir = path.join(this.config.paths.skillsCollection, skillName);
     await this.ensureDir(skillDir);
     const skillMdPath = path.join(skillDir, 'SKILL.md');
+    // 使用原始内容，不重新构建 frontmatter
+    const skillMdContent = skillData.content || '';
     await fs.writeFile(skillMdPath, skillMdContent, 'utf-8');
+
+    // 写入其他文件（如 scripts 目录下的文件）
+    if (skillData.files && skillData.files instanceof Map) {
+      for (const [filePath, content] of skillData.files) {
+        const fullPath = path.join(skillDir, filePath);
+        // 确保子目录存在
+        await this.ensureDir(path.dirname(fullPath));
+        await fs.writeFile(fullPath, content, 'utf-8');
+      }
+    }
 
     // 写入单独的 JSON 文件
     const skillJsonPath = path.join(this.skillsDir, `${skillName}.json`);
@@ -203,32 +211,5 @@ export class OutputWriter {
     await fs.writeFile(this.skillsJsonPath, JSON.stringify(data, null, 2), 'utf-8');
 
     return data;
-  }
-
-  /**
-   * 构建 SKILL.md 内容
-   */
-  buildSkillMd(features, bodyContent) {
-    const frontmatter = {
-      name: features.name,
-      description: features.description,
-      tags: features.tags,
-      version: features.version,
-      ...(features.author && { author: features.author }),
-      updatedAt: new Date().toISOString().split('T')[0],
-    };
-
-    // 清理空值
-    Object.keys(frontmatter).forEach(key => {
-      if (frontmatter[key] === undefined || frontmatter[key] === null || frontmatter[key] === '') {
-        delete frontmatter[key];
-      }
-    });
-
-    if (!bodyContent) {
-      bodyContent = `# ${features.name}\n\n${features.description}\n`;
-    }
-
-    return matter.stringify(bodyContent, frontmatter);
   }
 }

@@ -1,0 +1,16 @@
+{
+  "name": "atxp",
+  "path": "atxp",
+  "description": "Access ATXP paid API tools for web search, AI image generation, music creation, video generation, and X/Twitter search. Use when users need real-time web search, AI-generated media (images, music, video), or X/Twitter search. Requires authentication via `npx atxp login`.",
+  "tags": [
+    "api",
+    "cli",
+    "search",
+    "discovery"
+  ],
+  "version": "1.0.0",
+  "author": "moltbot",
+  "sourceUrl": "https://github.com/moltbot/skills/tree/main/skills/emilioacc/atxp",
+  "stars": 152,
+  "updatedAt": "2026-01-29T17:00:20.829Z"
+}

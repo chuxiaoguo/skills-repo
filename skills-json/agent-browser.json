@@ -1,0 +1,29 @@
+{
+  "name": "agent-browser",
+  "path": "agent-browser",
+  "description": "Automates browser interactions for web testing, form filling, screenshots, and data extraction. Use when the user needs to navigate websites, interact with web pages, fill forms, take screenshots, test web applications, or extract information from web pages.",
+  "tags": [
+    "testing",
+    "git",
+    "github",
+    "api",
+    "security",
+    "authentication",
+    "debugging",
+    "caching",
+    "performance",
+    "cli",
+    "code-generation",
+    "search",
+    "discovery",
+    "filesystem",
+    "io",
+    "bun",
+    "runtime"
+  ],
+  "version": "1.0.0",
+  "author": "code-yeongyu",
+  "sourceUrl": "https://github.com/code-yeongyu/oh-my-opencode/tree/dev/src/features/builtin-skills/agent-browser",
+  "stars": 25546,
+  "updatedAt": "2026-01-29T17:00:15.371Z"
+}

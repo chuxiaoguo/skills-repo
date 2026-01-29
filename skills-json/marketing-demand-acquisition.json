@@ -1,0 +1,26 @@
+{
+  "name": "marketing-demand-acquisition",
+  "path": "marketing-demand-acquisition",
+  "description": "Multi-channel demand generation, paid media optimization, SEO strategy, and partnership programs for Series A+ startups. Includes CAC calculator, channel playbooks, HubSpot integration, and international expansion tactics. Use when planning demand generation campaigns, optimizing paid media, building SEO strategies, establishing partnerships, or when user mentions demand gen, paid ads, LinkedIn ads, Google ads, CAC, acquisition, lead generation, or pipeline generation.",
+  "tags": [
+    "database",
+    "sql",
+    "testing",
+    "design",
+    "ui",
+    "performance",
+    "skills",
+    "cli",
+    "code-generation",
+    "search",
+    "discovery",
+    "planning",
+    "automation",
+    "maintenance"
+  ],
+  "version": "1.0.0",
+  "author": "davila7",
+  "sourceUrl": "https://github.com/davila7/claude-code-templates/tree/main/cli-tool/components/skills/business-marketing/marketing-demand-acquisition",
+  "stars": 18778,
+  "updatedAt": "2026-01-29T17:02:08.728Z"
+}

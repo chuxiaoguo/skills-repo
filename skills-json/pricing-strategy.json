@@ -1,0 +1,22 @@
+{
+  "name": "pricing-strategy",
+  "path": "pricing-strategy",
+  "description": "When the user wants help with pricing decisions, packaging, or monetization strategy. Also use when the user mentions 'pricing,' 'pricing tiers,' 'freemium,' 'free trial,' 'packaging,' 'price increase,' 'value metric,' 'Van Westendorp,' 'willingness to pay,' or 'monetization.' This skill covers pricing research, tier structure, and packaging strategy.",
+  "tags": [
+    "testing",
+    "design",
+    "api",
+    "security",
+    "performance",
+    "search",
+    "discovery",
+    "planning",
+    "automation",
+    "maintenance"
+  ],
+  "version": "1.0.0",
+  "author": "davila7",
+  "sourceUrl": "https://github.com/davila7/claude-code-templates/tree/main/cli-tool/components/skills/business-marketing/pricing-strategy",
+  "stars": 18778,
+  "updatedAt": "2026-01-29T17:01:51.797Z"
+}

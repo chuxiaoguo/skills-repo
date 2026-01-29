@@ -36,11 +36,29 @@ export class FeatureExtractor {
   /**
    * 从 API 返回的数据中提取特征
    */
-  extractFromApiData(apiData) {
+  extractFromApiData(apiData, options = {}) {
+    // 尝试从多个可能的字段中提取 tags
+    const rawTags = apiData.tags
+      || apiData.categories
+      || apiData.topics
+      || apiData.keywords
+      || apiData.labels;
+
+    if (options.debug) {
+      console.log(`  [extractFromApiData] ${apiData.name}:`, {
+        hasTags: !!apiData.tags,
+        hasCategories: !!apiData.categories,
+        hasTopics: !!apiData.topics,
+        hasKeywords: !!apiData.keywords,
+        hasLabels: !!apiData.labels,
+        extractedTags: this.normalizeTags(rawTags),
+      });
+    }
+
     return {
       name: apiData.name || '',
       description: apiData.description || apiData.summary || '',
-      tags: this.normalizeTags(apiData.tags || apiData.categories),
+      tags: this.normalizeTags(rawTags),
       version: apiData.version || '1.0.0',
       author: apiData.author || apiData.owner || '',
       sourceUrl: apiData.githubUrl || apiData.repository || apiData.url || '',
@@ -86,35 +104,97 @@ export class FeatureExtractor {
     const contentLower = content.toLowerCase();
 
     const keywordMap = {
+      // 前端框架
       'react': ['frontend', 'react'],
       'vue': ['frontend', 'vue'],
       'angular': ['frontend', 'angular'],
       'frontend': ['frontend'],
+      'next.js': ['nextjs', 'frontend', 'react'],
+      'nextjs': ['nextjs', 'frontend', 'react'],
+
+      // 后端
       'backend': ['backend'],
       'node': ['backend', 'nodejs'],
       'express': ['backend', 'express'],
+
+      // 数据库
       'database': ['database'],
       'sql': ['database', 'sql'],
+
+      // 测试
       'test': ['testing'],
       'testing': ['testing'],
       'jest': ['testing', 'jest'],
+
+      // Git/版本控制
       'git': ['git', 'version-control'],
       'github': ['git', 'github'],
+
+      // 设计
       'design': ['design'],
       'ui': ['design', 'ui'],
       'ux': ['design', 'ux'],
+
+      // API
       'api': ['api'],
       'rest': ['api', 'rest'],
       'graphql': ['api', 'graphql'],
+
+      // 安全
       'security': ['security'],
       'auth': ['security', 'authentication'],
+
+      // 调试与性能
       'debug': ['debugging'],
       'performance': ['performance'],
       'optimize': ['performance'],
+      'cache': ['caching', 'performance'],
+
+      // Skill/CLI 相关
+      'skill': ['skills', 'cli'],
+      'cli': ['cli'],
+
+      // 代码生成
+      'write': ['code-generation', 'writing'],
+      'author': ['code-generation', 'writing'],
+      'create': ['code-generation'],
+      'generate': ['code-generation'],
+      'scaffold': ['code-generation', 'scaffolding'],
+
+      // 搜索/查询
+      'search': ['search', 'discovery'],
+      'lookup': ['search', 'discovery'],
+      'find': ['search', 'discovery'],
+      'install': ['discovery'],
+
+      // 文档
+      'documentation': ['documentation', 'dx'],
+      'docs': ['documentation', 'dx'],
+      'mdx': ['documentation', 'mdx'],
+
+      // 规划/设计
+      'brainstorm': ['planning', 'design'],
+      'idea': ['planning'],
+      'plan': ['planning'],
+
+      // 文件操作
+      'file': ['filesystem', 'io'],
+      'fs': ['filesystem', 'io'],
+      'bun': ['bun', 'runtime'],
+
+      // 组件
+      'component': ['components', 'frontend'],
+
+      // 更新/同步
+      'update': ['automation', 'maintenance'],
+      'sync': ['automation', 'maintenance'],
     };
 
     for (const [keyword, associatedTags] of Object.entries(keywordMap)) {
-      if (contentLower.includes(keyword)) {
+      // 使用单词边界匹配，避免子字符串误匹配
+      // 例如 "test" 不应该匹配 "testing" 中的子串
+      const regex = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (regex.test(contentLower)) {
         associatedTags.forEach(tag => tags.add(tag));
       }
     }
