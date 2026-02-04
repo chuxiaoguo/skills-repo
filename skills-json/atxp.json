@@ -9,8 +9,10 @@
     "discovery"
   ],
   "version": "1.0.0",
-  "author": "moltbot",
-  "sourceUrl": "https://github.com/moltbot/skills/tree/main/skills/emilioacc/atxp",
-  "stars": 152,
-  "updatedAt": "2026-01-29T17:00:20.829Z"
+  "author": "openclaw",
+  "owner": "openclaw",
+  "repo": "skills",
+  "sourceUrl": "https://github.com/openclaw/skills/tree/main/skills/emilioacc/atxp",
+  "stars": 508,
+  "updatedAt": "2026-02-04T03:53:35.126Z"
 }

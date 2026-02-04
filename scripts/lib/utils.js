@@ -3,6 +3,64 @@
  * 包括 GitHub 内容获取、命令行解析等
  */
 
+import { CONFIG } from './config.js';
+
+/**
+ * 带重试的 fetch 函数
+ * @param {string} url - 请求 URL
+ * @param {Object} options - fetch 选项
+ * @param {number} retries - 重试次数
+ * @param {number} delay - 重试延迟（毫秒）
+ */
+async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
+  let lastError;
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+
+      // 如果是 403 或 429（速率限制），等待后重试
+      if (response.status === 403 || response.status === 429) {
+        const retryAfter = response.headers.get('Retry-After');
+        const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : delay * Math.pow(2, i);
+        console.log(`  ⏳ 速率限制，等待 ${waitTime / 1000}s 后重试 (${i + 1}/${retries})...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (i < retries - 1) {
+        console.log(`  ⏳ 请求失败，${delay / 1000}s 后重试 (${i + 1}/${retries})...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+/**
+ * 获取 GitHub API 请求头
+ */
+function getGithubHeaders(isApi = false) {
+  const headers = {
+    'User-Agent': 'skills-sync/1.0',
+  };
+
+  if (isApi) {
+    headers['Accept'] = 'application/vnd.github.v3+json';
+  }
+
+  // 如果配置了 GitHub Token，添加认证头
+  if (CONFIG.github.token) {
+    headers['Authorization'] = `Bearer ${CONFIG.github.token}`;
+  }
+
+  return headers;
+}
+
 /**
  * 从 GitHub URL 解析仓库信息和路径
  * 支持格式:
@@ -69,9 +127,9 @@ export async function fetchGithubContent(features) {
       for (const p of pathsToTry) {
         try {
           const skillMdUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${b}/${p}`;
-          const response = await fetch(skillMdUrl, {
-            headers: { 'User-Agent': 'skills-sync/1.0' },
-          });
+          const response = await fetchWithRetry(skillMdUrl, {
+            headers: getGithubHeaders(false),
+          }, 3, 1000);
 
           if (response.ok) {
             skillMd = await response.text();
@@ -79,8 +137,11 @@ export async function fetchGithubContent(features) {
             foundPath = path || '';
             break;
           }
-        } catch {
+        } catch (error) {
           // 继续尝试下一个路径或分支
+          if (error.message && !error.message.includes('fetch failed')) {
+            console.log(`  ⚠️ 获取 SKILL.md 失败: ${error.message}`);
+          }
         }
       }
       if (skillMd) break;
@@ -94,15 +155,14 @@ export async function fetchGithubContent(features) {
     const files = new Map();
     const skillDir = foundPath;
 
+    let fetchErrors = [];
+
     if (skillDir) {
       try {
         const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${skillDir}?ref=${foundBranch}`;
-        const response = await fetch(apiUrl, {
-          headers: {
-            'User-Agent': 'skills-sync/1.0',
-            'Accept': 'application/vnd.github.v3+json',
-          },
-        });
+        const response = await fetchWithRetry(apiUrl, {
+          headers: getGithubHeaders(true),
+        }, 3, 1000);
 
         if (response.ok) {
           const items = await response.json();
@@ -115,15 +175,16 @@ export async function fetchGithubContent(features) {
                   return null;
                 }
                 try {
-                  const contentResponse = await fetch(item.download_url, {
-                    headers: { 'User-Agent': 'skills-sync/1.0' },
-                  });
+                  const contentResponse = await fetchWithRetry(item.download_url, {
+                    headers: getGithubHeaders(false),
+                  }, 2, 500);
                   if (contentResponse.ok) {
                     const content = await contentResponse.text();
                     return { path: item.name, content };
                   }
-                } catch {
-                  // 忽略单个文件获取错误
+                } catch (error) {
+                  // 记录文件获取错误
+                  fetchErrors.push({ type: 'file', path: item.name, error: error.message });
                 }
               } else if (item.type === 'dir') {
                 // 递归获取子目录
@@ -131,6 +192,74 @@ export async function fetchGithubContent(features) {
                   owner, repo, item.path, foundBranch, item.name
                 );
                 return subFiles;
+              } else if (item.type === 'symlink') {
+                // 处理符号链接 - 获取链接指向的实际内容
+                console.log(`  🔗 发现符号链接: ${item.name}`);
+                try {
+                  // 首先获取符号链接文件本身的内容（即目标路径）
+                  const linkResponse = await fetch(item.download_url, {
+                    headers: { 'User-Agent': 'skills-sync/1.0' },
+                  });
+                  if (!linkResponse.ok) {
+                    console.log(`  ⚠️ 无法读取符号链接: ${item.name}`);
+                    return null;
+                  }
+                  const targetPath = (await linkResponse.text()).trim();
+                  console.log(`  📍 链接目标: ${targetPath}`);
+
+                  // 计算目标路径的绝对路径（相对于仓库根目录）
+                  const currentDir = item.path.substring(0, item.path.lastIndexOf('/'));
+                  let resolvedPath;
+                  if (targetPath.startsWith('/')) {
+                    // 绝对路径（从仓库根目录开始）
+                    resolvedPath = targetPath.substring(1);
+                  } else if (targetPath.startsWith('./')) {
+                    // 相对当前目录
+                    resolvedPath = `${currentDir}/${targetPath.substring(2)}`;
+                  } else if (targetPath.startsWith('../')) {
+                    // 相对上级目录，需要解析 ..
+                    const parts = currentDir.split('/');
+                    const targetParts = targetPath.split('/');
+                    for (const part of targetParts) {
+                      if (part === '..') {
+                        parts.pop();
+                      } else if (part !== '.' && part !== '') {
+                        parts.push(part);
+                      }
+                    }
+                    resolvedPath = parts.join('/');
+                  } else {
+                    // 普通相对路径
+                    resolvedPath = `${currentDir}/${targetPath}`;
+                  }
+                  console.log(`  📂 解析路径: ${resolvedPath}`);
+
+                  // 尝试获取目标路径的内容
+                  // 首先尝试作为目录
+                  const subFiles = await fetchDirectoryContents(
+                    owner, repo, resolvedPath, foundBranch, item.name
+                  );
+                  if (subFiles.length > 0) {
+                    console.log(`  ✅ 获取目录内容: ${subFiles.length} 个文件`);
+                    return subFiles;
+                  }
+
+                  // 尝试作为文件
+                  const targetUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${foundBranch}/${resolvedPath}`;
+                  const contentResponse = await fetch(targetUrl, {
+                    headers: { 'User-Agent': 'skills-sync/1.0' },
+                  });
+                  if (contentResponse.ok) {
+                    const content = await contentResponse.text();
+                    console.log(`  ✅ 获取文件内容: ${content.length} 字节`);
+                    return { path: item.name, content };
+                  }
+
+                  console.log(`  ⚠️ 无法获取链接目标: ${resolvedPath}`);
+                } catch (error) {
+                  console.log(`  ⚠️ 无法获取符号链接内容: ${item.name} - ${error.message}`);
+                }
+                return null;
               }
               return null;
             });
@@ -169,12 +298,9 @@ async function fetchDirectoryContents(owner, repo, dirPath, branch, basePath) {
   const files = [];
   try {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${dirPath}?ref=${branch}`;
-    const response = await fetch(apiUrl, {
-      headers: {
-        'User-Agent': 'skills-sync/1.0',
-        'Accept': 'application/vnd.github.v3+json',
-      },
-    });
+    const response = await fetchWithRetry(apiUrl, {
+      headers: getGithubHeaders(true),
+    }, 3, 1000);
 
     if (response.ok) {
       const items = await response.json();
@@ -182,9 +308,9 @@ async function fetchDirectoryContents(owner, repo, dirPath, branch, basePath) {
         for (const item of items) {
           if (item.type === 'file') {
             try {
-              const contentResponse = await fetch(item.download_url, {
-                headers: { 'User-Agent': 'skills-sync/1.0' },
-              });
+              const contentResponse = await fetchWithRetry(item.download_url, {
+                headers: getGithubHeaders(false),
+              }, 2, 500);
               if (contentResponse.ok) {
                 const content = await contentResponse.text();
                 files.push({ path: `${basePath}/${item.name}`, content });
@@ -198,6 +324,67 @@ async function fetchDirectoryContents(owner, repo, dirPath, branch, basePath) {
               owner, repo, item.path, branch, `${basePath}/${item.name}`
             );
             files.push(...subFiles);
+          } else if (item.type === 'symlink') {
+            // 处理符号链接
+            console.log(`  🔗 发现符号链接: ${item.name}`);
+            try {
+              // 首先获取符号链接文件本身的内容（即目标路径）
+              const linkResponse = await fetchWithRetry(item.download_url, {
+                headers: getGithubHeaders(false),
+              }, 2, 500);
+              if (!linkResponse.ok) {
+                console.log(`  ⚠️ 无法读取符号链接: ${item.name}`);
+                continue;
+              }
+              const targetPath = (await linkResponse.text()).trim();
+              console.log(`  📍 链接目标: ${targetPath}`);
+
+              // 计算目标路径的绝对路径
+              const currentDir = item.path.substring(0, item.path.lastIndexOf('/'));
+              let resolvedPath;
+              if (targetPath.startsWith('/')) {
+                resolvedPath = targetPath.substring(1);
+              } else if (targetPath.startsWith('./')) {
+                resolvedPath = `${currentDir}/${targetPath.substring(2)}`;
+              } else if (targetPath.startsWith('../')) {
+                const parts = currentDir.split('/');
+                const targetParts = targetPath.split('/');
+                for (const part of targetParts) {
+                  if (part === '..') {
+                    parts.pop();
+                  } else if (part !== '.' && part !== '') {
+                    parts.push(part);
+                  }
+                }
+                resolvedPath = parts.join('/');
+              } else {
+                resolvedPath = `${currentDir}/${targetPath}`;
+              }
+              console.log(`  📂 解析路径: ${resolvedPath}`);
+
+              // 尝试获取目标目录内容
+              const subFiles = await fetchDirectoryContents(
+                owner, repo, resolvedPath, branch, `${basePath}/${item.name}`
+              );
+              if (subFiles.length > 0) {
+                console.log(`  ✅ 获取目录内容: ${subFiles.length} 个文件`);
+                files.push(...subFiles);
+                continue;
+              }
+
+              // 尝试作为文件
+              const targetUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${resolvedPath}`;
+              const contentResponse = await fetchWithRetry(targetUrl, {
+                headers: getGithubHeaders(false),
+              }, 2, 500);
+              if (contentResponse.ok) {
+                const content = await contentResponse.text();
+                console.log(`  ✅ 获取文件内容: ${content.length} 字节`);
+                files.push({ path: `${basePath}/${item.name}`, content });
+              }
+            } catch (error) {
+              console.log(`  ⚠️ 无法获取符号链接内容: ${item.name} - ${error.message}`);
+            }
           }
         }
       }
@@ -220,6 +407,8 @@ export function parseArgs() {
     sortBy: 'stars',
     useAiSearch: false,
     forceUpdate: false,
+    nonInteractive: false,
+    conflictStrategy: 'skip', // 'skip' | 'replace' | 'keep-both'
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -246,6 +435,15 @@ export function parseArgs() {
         break;
       case '--force':
         options.forceUpdate = true;
+        break;
+      case '--non-interactive':
+        options.nonInteractive = true;
+        break;
+      case '--conflict-strategy':
+        const strategy = args[++i];
+        if (['skip', 'replace', 'keep-both'].includes(strategy)) {
+          options.conflictStrategy = strategy;
+        }
         break;
     }
   }

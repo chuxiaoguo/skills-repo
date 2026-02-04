@@ -4,6 +4,34 @@
  */
 import matter from 'gray-matter';
 
+/**
+ * 从 sourceUrl 解析 owner 和 repo
+ * @param {string} sourceUrl - 如 https://github.com/owner/repo
+ * @returns {Object} { owner, repo }
+ */
+export function parseOwnerRepo(sourceUrl) {
+  if (!sourceUrl) return { owner: '', repo: '' };
+
+  try {
+    const url = new URL(sourceUrl);
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length >= 2) {
+      return {
+        owner: parts[0],
+        repo: parts[1].replace(/\.git$/, ''),
+      };
+    }
+  } catch {
+    // 尝试正则匹配
+    const match = sourceUrl.match(/github\.com\/([^\/]+)\/([^\/\.]+)/);
+    if (match) {
+      return { owner: match[1], repo: match[2] };
+    }
+  }
+
+  return { owner: '', repo: '' };
+}
+
 export class FeatureExtractor {
   /**
    * 从 SKILL.md 内容提取特征
@@ -55,13 +83,18 @@ export class FeatureExtractor {
       });
     }
 
+    const sourceUrl = apiData.githubUrl || apiData.repository || apiData.url || '';
+    const { owner, repo } = parseOwnerRepo(sourceUrl);
+
     return {
       name: apiData.name || '',
       description: apiData.description || apiData.summary || '',
       tags: this.normalizeTags(rawTags),
       version: apiData.version || '1.0.0',
       author: apiData.author || apiData.owner || '',
-      sourceUrl: apiData.githubUrl || apiData.repository || apiData.url || '',
+      owner,
+      repo: repo || apiData.name || '',
+      sourceUrl,
       stars: apiData.stars || 0,
       updatedAt: apiData.updatedAt ? new Date(apiData.updatedAt * 1000).toISOString() : null,
     };

@@ -1,0 +1,25 @@
+{
+  "name": "seo-audit",
+  "path": "seo-audit",
+  "description": "When the user wants to audit, review, or diagnose SEO issues on their site. Also use when the user mentions \"SEO audit,\" \"technical SEO,\" \"why am I not ranking,\" \"SEO issues,\" \"on-page SEO,\" \"meta tags review,\" or \"SEO health check.\" For building pages at scale to target keywords, see programmatic-seo. For adding structured data, see schema-markup.",
+  "tags": [
+    "testing",
+    "design",
+    "security",
+    "performance",
+    "code-generation",
+    "writing",
+    "search",
+    "discovery",
+    "planning",
+    "filesystem",
+    "io"
+  ],
+  "version": "1.0.0",
+  "author": "davila7",
+  "owner": "davila7",
+  "repo": "claude-code-templates",
+  "sourceUrl": "https://github.com/davila7/claude-code-templates/tree/main/cli-tool/components/skills/business-marketing/seo-audit",
+  "stars": 19369,
+  "updatedAt": "2026-02-04T03:55:02.142Z"
+}

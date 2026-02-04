@@ -1,0 +1,23 @@
+{
+  "name": "vercel-react-best-practices",
+  "path": "vercel-react-best-practices",
+  "description": "React and Next.js performance optimization guidelines from Vercel Engineering. This skill should be used when writing, reviewing, or refactoring React/Next.js code to ensure optimal performance patterns. Triggers on tasks involving React components, Next.js pages, data fetching, bundle optimization, or performance improvements.",
+  "tags": [
+    "frontend",
+    "react",
+    "nextjs",
+    "api",
+    "performance",
+    "caching",
+    "filesystem",
+    "io",
+    "components"
+  ],
+  "version": "1.0.0",
+  "author": "lobehub",
+  "owner": "lobehub",
+  "repo": "lobehub",
+  "sourceUrl": "https://github.com/lobehub/lobehub/tree/main/.agents/skills/vercel-react-best-practices",
+  "stars": 71882,
+  "updatedAt": "2026-02-04T03:44:28.577Z"
+}

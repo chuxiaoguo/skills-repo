@@ -15,7 +15,9 @@
   ],
   "version": "1.0.0",
   "author": "anthropics",
+  "owner": "anthropics",
+  "repo": "claude-code",
   "sourceUrl": "https://github.com/anthropics/claude-code/tree/main/plugins/frontend-design/skills/frontend-design",
-  "stars": 61871,
-  "updatedAt": "2026-01-29T17:00:14.130Z"
+  "stars": 63634,
+  "updatedAt": "2026-02-04T03:51:22.086Z"
 }

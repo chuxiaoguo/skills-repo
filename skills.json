@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-01-29T17:02:08.748Z",
+    "generatedAt": "2026-02-04T03:35:48.115Z",
     "total": 49
   },
   "skills": [
@@ -975,9 +975,11 @@
       ],
       "version": "1.0.0",
       "author": "nextlevelbuilder",
+      "owner": "nextlevelbuilder",
+      "repo": "ui-ux-pro-max-skill",
       "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill/tree/main/.claude/skills/ui-ux-pro-max",
       "stars": 24549,
-      "updatedAt": "2026-01-29T17:01:24.592Z"
+      "updatedAt": "2026-01-30T11:48:03.571Z"
     },
     {
       "name": "upgrading-expo",
@@ -1046,25 +1048,29 @@
     {
       "name": "vue-best-practices",
       "path": "vue-best-practices",
-      "description": "Vue 3 and Vue.js best practices for TypeScript, vue-tsc, and Volar. This skill should be used when writing, reviewing, or refactoring Vue components to ensure correct typing patterns. Triggers on tasks involving Vue components, props extraction, wrapper components, template type checking, or Volar configuration.",
+      "description": "MUST be used for Vue.js tasks. Strongly recommends Composition API with `<script setup>` and TypeScript as the standard approach. Covers Vue 3, SSR, Volar, vue-tsc. Load for any Vue, .vue files, Vue Router, Pinia, or Vite with Vue work. ALWAYS use Composition API unless the project explicitly requires Options API.",
       "tags": [
         "frontend",
+        "react",
         "vue",
-        "git",
-        "github",
-        "search",
+        "api",
+        "security",
+        "performance",
+        "caching",
         "discovery",
-        "documentation",
-        "dx",
+        "filesystem",
+        "io",
         "components",
         "automation",
         "maintenance"
       ],
       "version": "1.0.0",
       "author": "antfu",
+      "owner": "antfu",
+      "repo": "skills",
       "sourceUrl": "https://github.com/antfu/skills/tree/main/skills/vue-best-practices",
-      "stars": 1460,
-      "updatedAt": "2026-01-29T17:01:42.353Z"
+      "stars": 2809,
+      "updatedAt": "2026-02-04T03:35:48.108Z"
     },
     {
       "name": "wcag-audit-patterns",

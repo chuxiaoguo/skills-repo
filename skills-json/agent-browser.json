@@ -23,7 +23,9 @@
   ],
   "version": "1.0.0",
   "author": "code-yeongyu",
+  "owner": "code-yeongyu",
+  "repo": "oh-my-opencode",
   "sourceUrl": "https://github.com/code-yeongyu/oh-my-opencode/tree/dev/src/features/builtin-skills/agent-browser",
-  "stars": 25546,
-  "updatedAt": "2026-01-29T17:00:15.371Z"
+  "stars": 27686,
+  "updatedAt": "2026-02-04T03:52:34.476Z"
 }

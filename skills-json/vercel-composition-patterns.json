@@ -12,7 +12,9 @@
   ],
   "version": "1.0.0",
   "author": "vercel-labs",
+  "owner": "vercel-labs",
+  "repo": "agent-skills",
   "sourceUrl": "https://github.com/vercel-labs/agent-skills/tree/main/skills/composition-patterns",
-  "stars": 17585,
-  "updatedAt": "2026-01-29T17:00:30.967Z"
+  "stars": 18717,
+  "updatedAt": "2026-02-04T03:54:19.033Z"
 }

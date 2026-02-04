@@ -1,12 +1,10 @@
 {
   "name": "skill-creator",
   "path": "skill-creator",
-  "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Gemini CLI's capabilities with specialized knowledge, workflows, or tool integrations.",
+  "description": "Create or update AgentSkills. Use when designing, structuring, or packaging skills with scripts, references, and assets.",
   "tags": [
     "frontend",
     "react",
-    "backend",
-    "nodejs",
     "database",
     "testing",
     "design",
@@ -26,8 +24,10 @@
     "maintenance"
   ],
   "version": "1.0.0",
-  "author": "google-gemini",
-  "sourceUrl": "https://github.com/google-gemini/gemini-cli/tree/main/packages/core/src/skills/builtin/skill-creator",
-  "stars": 92879,
-  "updatedAt": "2026-01-29T17:00:19.284Z"
+  "author": "openclaw",
+  "owner": "openclaw",
+  "repo": "openclaw",
+  "sourceUrl": "https://github.com/openclaw/openclaw/tree/main/skills/skill-creator",
+  "stars": 156384,
+  "updatedAt": "2026-02-04T03:53:23.840Z"
 }

@@ -4,12 +4,19 @@
  */
 import fs from 'fs/promises';
 import path from 'path';
+import { ConflictResolver, parseOwnerRepo } from './conflict-resolver.js';
 
 export class OutputWriter {
-  constructor(config) {
+  constructor(config, options = {}) {
     this.config = config;
     this.skillsDir = config.paths.skillsDir;
     this.skillsJsonPath = config.paths.skillsJson;
+    this.conflictResolver = options.conflictResolver || new ConflictResolver({
+      nonInteractive: options.nonInteractive,
+      defaultStrategy: options.defaultConflictStrategy || 'skip',
+    });
+    this.localSkills = []; // 当前已加载的本地 skills
+    this.conflictResults = []; // 冲突处理结果
   }
 
   /**
@@ -56,11 +63,16 @@ export class OutputWriter {
    * 检查 skill 是否需要更新
    * @returns {Object} { needsUpdate: boolean, reason: string }
    */
-  async checkNeedsUpdate(skillName, newData) {
+  async checkNeedsUpdate(skillName, newData, options = {}) {
     const existingSkillJson = await this.readSkillJson(skillName);
 
     if (!existingSkillJson) {
       return { needsUpdate: true, reason: '新技能' };
+    }
+
+    // 强制更新模式
+    if (options.forceUpdate) {
+      return { needsUpdate: true, reason: '强制更新 (--force)' };
     }
 
     // 检查关键字段是否有变化
@@ -85,17 +97,31 @@ export class OutputWriter {
 
   /**
    * 保存 skill 到目录
-   * @returns {Object} { saved: boolean, path: string, action: 'created'|'updated'|'skipped' }
+   * @returns {Object} { saved: boolean, path: string, action: 'created'|'updated'|'skipped'|'conflict' }
    */
-  async saveSkill(skillData, features) {
+  async saveSkill(skillData, features, options = {}) {
     const skillName = skillData.name;
 
     // 检查是否需要更新
-    const { needsUpdate, reason } = await this.checkNeedsUpdate(skillName, features);
+    const { needsUpdate, reason } = await this.checkNeedsUpdate(skillName, features, options);
 
     if (!needsUpdate) {
       console.log(`  ⏭️  跳过: ${skillName} (${reason})`);
       return { saved: false, action: 'skipped', reason };
+    }
+
+    // 检查是否为同名冲突（同名不同源）
+    const existingSkillJson = await this.readSkillJson(skillName);
+    if (existingSkillJson && this.conflictResolver.isConflict(existingSkillJson, features)) {
+      // 添加到冲突队列，稍后统一处理
+      this.conflictResolver.addConflict(existingSkillJson, features);
+      this.localSkills.push(existingSkillJson);
+      return {
+        saved: false,
+        action: 'conflict',
+        reason: `同名冲突: ${existingSkillJson.owner || parseOwnerRepo(existingSkillJson.sourceUrl).owner} vs ${features.owner}`,
+        conflictContext: { existing: existingSkillJson, incoming: features },
+      };
     }
 
     // 确保目录存在
@@ -107,6 +133,10 @@ export class OutputWriter {
     const skillMdPath = path.join(skillDir, 'SKILL.md');
     // 使用原始内容，不重新构建 frontmatter
     const skillMdContent = skillData.content || '';
+    if (!skillMdContent.trim()) {
+      console.log(`  ⚠️ 跳过: ${skillName} (SKILL.md 内容为空，GitHub 下载可能失败)`);
+      return { saved: false, action: 'skipped', reason: '内容为空' };
+    }
     await fs.writeFile(skillMdPath, skillMdContent, 'utf-8');
 
     // 写入其他文件（如 scripts 目录下的文件）
@@ -121,6 +151,12 @@ export class OutputWriter {
 
     // 写入单独的 JSON 文件
     const skillJsonPath = path.join(this.skillsDir, `${skillName}.json`);
+
+    // 从 sourceUrl 解析 owner/repo（如果 features 中没有）
+    const { owner, repo } = features.owner
+      ? { owner: features.owner, repo: features.repo || features.name }
+      : parseOwnerRepo(features.sourceUrl);
+
     const skillJsonData = {
       name: features.name,
       path: skillName,
@@ -128,6 +164,8 @@ export class OutputWriter {
       tags: features.tags,
       version: features.version,
       author: features.author,
+      owner,
+      repo,
       sourceUrl: features.sourceUrl,
       stars: features.stars,
       updatedAt: new Date().toISOString(),
@@ -211,5 +249,132 @@ export class OutputWriter {
     await fs.writeFile(this.skillsJsonPath, JSON.stringify(data, null, 2), 'utf-8');
 
     return data;
+  }
+
+  /**
+   * 解决所有待处理的冲突
+   * @param {Array} skillDataList - 原始 skill 数据列表（用于重命名后保存）
+   * @returns {Array} 冲突处理结果
+   */
+  async resolveAllConflicts(skillDataList) {
+    if (this.conflictResolver.queue.length === 0) {
+      return [];
+    }
+
+    // 加载所有本地 skills
+    const entries = await fs.readdir(this.skillsDir, { withFileTypes: true });
+    const allLocalSkills = [];
+
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+      try {
+        const content = await fs.readFile(path.join(this.skillsDir, entry.name), 'utf-8');
+        allLocalSkills.push(JSON.parse(content));
+      } catch {
+        // 忽略解析失败的文件
+      }
+    }
+
+    // 解决所有冲突
+    const results = await this.conflictResolver.resolveAll(allLocalSkills);
+
+    // 应用解决结果到文件系统
+    for (const { conflict, result } of results) {
+      await this.applyConflictResolution(conflict, result, skillDataList);
+    }
+
+    return results;
+  }
+
+  /**
+   * 应用冲突解决结果到文件系统
+   */
+  async applyConflictResolution(conflict, result, skillDataList) {
+    switch (result.action) {
+      case 'skip':
+        console.log(`  ⏭️  跳过冲突: ${conflict.incoming.name}`);
+        break;
+
+      case 'replace': {
+        // 找到对应的 skillData
+        const skillData = skillDataList.find(s => s.name === conflict.incoming.name);
+        if (skillData) {
+          // 直接覆盖（重用现有逻辑）
+          await this.saveSkillInternal(skillData, conflict.incoming, result.target);
+        }
+        break;
+      }
+
+      case 'rename': {
+        // 重命名保存
+        const skillData = skillDataList.find(s => s.name === conflict.incoming.name);
+        if (skillData) {
+          // 创建重命名后的 skill 数据副本
+          const renamedSkillData = { ...skillData, name: result.newName };
+          const renamedFeatures = { ...conflict.incoming, name: result.newName };
+          await this.saveSkillInternal(renamedSkillData, renamedFeatures, result.newName);
+          console.log(`  ✅ 重命名保存: ${conflict.incoming.name} → ${result.newName}`);
+        }
+        break;
+      }
+    }
+  }
+
+  /**
+   * 内部保存方法（允许指定 skillName）
+   */
+  async saveSkillInternal(skillData, features, skillName) {
+    // 确保目录存在
+    await this.ensureDir(this.skillsDir);
+
+    // 写入 SKILL.md
+    const skillDir = path.join(this.config.paths.skillsCollection, skillName);
+    await this.ensureDir(skillDir);
+    const skillMdPath = path.join(skillDir, 'SKILL.md');
+    const skillMdContent = skillData.content || '';
+    if (!skillMdContent.trim()) {
+      console.log(`  ⚠️ 跳过: ${skillName} (SKILL.md 内容为空，GitHub 下载可能失败)`);
+      return { saved: false, action: 'skipped', reason: '内容为空' };
+    }
+    await fs.writeFile(skillMdPath, skillMdContent, 'utf-8');
+
+    // 写入其他文件
+    if (skillData.files && skillData.files instanceof Map) {
+      for (const [filePath, content] of skillData.files) {
+        const fullPath = path.join(skillDir, filePath);
+        await this.ensureDir(path.dirname(fullPath));
+        await fs.writeFile(fullPath, content, 'utf-8');
+      }
+    }
+
+    // 写入 JSON 文件
+    const skillJsonPath = path.join(this.skillsDir, `${skillName}.json`);
+    const { owner, repo } = features.owner
+      ? { owner: features.owner, repo: features.repo || features.name }
+      : parseOwnerRepo(features.sourceUrl);
+
+    const skillJsonData = {
+      name: features.name,
+      path: skillName,
+      description: features.description,
+      tags: features.tags,
+      version: features.version,
+      author: features.author,
+      owner,
+      repo,
+      sourceUrl: features.sourceUrl,
+      stars: features.stars,
+      updatedAt: new Date().toISOString(),
+    };
+    await fs.writeFile(skillJsonPath, JSON.stringify(skillJsonData, null, 2), 'utf-8');
+
+    console.log(`  ✅ 替换: ${skillName}`);
+
+    return {
+      saved: true,
+      action: 'updated',
+      path: skillDir,
+      data: skillJsonData,
+    };
   }
 }

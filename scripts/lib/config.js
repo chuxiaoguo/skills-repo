@@ -18,6 +18,10 @@ export const CONFIG = {
     baseUrl: process.env.SKILLSMP_BASE_URL || 'https://skillsmp.com/api/v1',
     token: process.env.SKILLSMP_API_TOKEN,
   },
+  // GitHub API 配置
+  github: {
+    token: process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '',
+  },
   // 路径配置
   paths: {
     root: ROOT_DIR,

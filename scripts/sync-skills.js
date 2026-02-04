@@ -7,6 +7,12 @@
  *   npm run skills:sync -- --names "skill-a" "skill-b"    # 按名字同步
  *   npm run skills:sync -- --limit 50 --sort stars       # 批量同步热门 skills
  *   npm run skills:sync -- --names "react" --force       # 强制更新（忽略缓存）
+ *
+ * 冲突处理选项:
+ *   npm run skills:sync -- --names "skill-a"             # 交互式解决冲突（默认）
+ *   npm run skills:sync -- --non-interactive              # 非交互模式（默认跳过冲突）
+ *   npm run skills:sync -- --conflict-strategy replace    # 冲突时自动替换
+ *   npm run skills:sync -- --conflict-strategy keep-both  # 冲突时自动保留两者
  */
 
 import { CONFIG, validateConfig } from './lib/config.js';
@@ -28,7 +34,10 @@ async function main() {
   }
 
   const args = parseArgs();
-  const controller = new SyncController(CONFIG);
+  const controller = new SyncController(CONFIG, {
+    nonInteractive: args.nonInteractive,
+    defaultConflictStrategy: args.conflictStrategy || 'skip',
+  });
 
   try {
     let results;
@@ -40,17 +49,19 @@ async function main() {
       }
       results = await controller.syncByNames(args.names, {
         useAiSearch: args.useAiSearch,
+        forceUpdate: args.forceUpdate,
       });
     } else {
       results = await controller.syncBatch(args.limit, args.sortBy);
     }
 
+    // 解决所有冲突
+    await controller.resolveAllConflicts();
+
     // 合并到 skills.json
-    if (results.length > 0) {
-      console.log('\n📝 更新 skills.json...');
-      await controller.writer.mergeSkillsFromDir();
-      console.log('  ✅ 已更新');
-    }
+    console.log('\n📝 更新 skills.json...');
+    await controller.writer.mergeSkillsFromDir();
+    console.log('  ✅ 已更新');
 
     controller.printStats();
     console.log('\n✅ 同步完成!');
