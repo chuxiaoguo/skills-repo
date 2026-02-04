@@ -57,6 +57,7 @@
   "options": {
     "useAiSearch": false,
     "autoMerge": true,
-    "skipExisting": true
+    "skipExisting": true,
+    "autoSelect": true
   }
 }

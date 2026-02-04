@@ -35,15 +35,20 @@ export function parseOwnerRepo(sourceUrl) {
 export class FeatureExtractor {
   /**
    * 从 SKILL.md 内容提取特征
+   * @param {string} content - SKILL.md 内容
+   * @param {object} options - 选项
+   * @param {string} options.owner - 仓库 owner，会强制作为第一个标签
+   * @param {number} options.maxTags - 最大标签数量，默认 5
    */
-  extract(content) {
+  extract(content, options = {}) {
+    const { owner, maxTags = 5 } = options;
     const parsed = matter(content);
     const frontmatter = parsed.data || {};
 
     const features = {
       name: frontmatter.name || '',
       description: frontmatter.description || '',
-      tags: this.normalizeTags(frontmatter.tags),
+      tags: this.normalizeTags(frontmatter.tags, { owner, maxTags }),
       version: frontmatter.version || '1.0.0',
       author: frontmatter.author || '',
     };
@@ -55,7 +60,7 @@ export class FeatureExtractor {
 
     // 如果缺少 tags，从内容中推断
     if (features.tags.length === 0 && parsed.content) {
-      features.tags = this.inferTagsFromContent(parsed.content);
+      features.tags = this.normalizeTags(this.inferTagsFromContent(parsed.content), { owner, maxTags });
     }
 
     return features;
@@ -86,10 +91,13 @@ export class FeatureExtractor {
     const sourceUrl = apiData.githubUrl || apiData.repository || apiData.url || '';
     const { owner, repo } = parseOwnerRepo(sourceUrl);
 
+    // 标准化标签，强制包含 owner，最多 5 个
+    const normalizedTags = this.normalizeTags(rawTags, { owner, maxTags: 5 });
+
     return {
       name: apiData.name || '',
       description: apiData.description || apiData.summary || '',
-      tags: this.normalizeTags(rawTags),
+      tags: normalizedTags,
       version: apiData.version || '1.0.0',
       author: apiData.author || apiData.owner || '',
       owner,
@@ -102,12 +110,49 @@ export class FeatureExtractor {
 
   /**
    * 标准化 tags
+   * @param {string|array} tags - 原始标签
+   * @param {object} options - 选项
+   * @param {string} options.owner - 仓库 owner，会强制作为第一个标签
+   * @param {number} options.maxTags - 最大标签数量，默认 5
+   * @returns {string[]} 标准化后的标签数组
    */
-  normalizeTags(tags) {
-    if (!tags) return [];
-    if (typeof tags === 'string') return tags.split(/[,;]/).map(t => t.trim()).filter(Boolean);
-    if (Array.isArray(tags)) return tags.map(t => String(t).trim()).filter(Boolean);
-    return [];
+  normalizeTags(tags, options = {}) {
+    const { owner, maxTags = 5 } = options;
+
+    // 基础标准化
+    let normalized = [];
+    if (!tags) {
+      normalized = [];
+    } else if (typeof tags === 'string') {
+      normalized = tags.split(/[,;]/).map(t => t.trim()).filter(Boolean);
+    } else if (Array.isArray(tags)) {
+      normalized = tags.map(t => String(t).trim()).filter(Boolean);
+    }
+
+    // 去重（保持顺序）
+    const seen = new Set();
+    normalized = normalized.filter(tag => {
+      const lower = tag.toLowerCase();
+      if (seen.has(lower)) return false;
+      seen.add(lower);
+      return true;
+    });
+
+    // 强制添加 owner 作为第一个标签（如果提供）
+    if (owner && owner.trim()) {
+      const ownerTag = owner.trim();
+      // 移除已存在的 owner 标签（避免重复）
+      normalized = normalized.filter(tag => tag.toLowerCase() !== ownerTag.toLowerCase());
+      // 将 owner 插入到最前面
+      normalized.unshift(ownerTag);
+    }
+
+    // 限制标签数量
+    if (normalized.length > maxTags) {
+      normalized = normalized.slice(0, maxTags);
+    }
+
+    return normalized;
   }
 
   /**

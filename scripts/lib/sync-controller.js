@@ -87,8 +87,11 @@ export class SyncController {
           if (githubContent) {
             apiData.content = githubContent.skillMd;
             apiData.files = githubContent.files;
-            // 从 GitHub 内容提取更详细的特征
-            const extractedFeatures = this.extractor.extract(githubContent.skillMd);
+            // 从 GitHub 内容提取更详细的特征，传入 owner 以保持标签一致性
+            const extractedFeatures = this.extractor.extract(githubContent.skillMd, {
+              owner: features.owner,
+              maxTags: 5,
+            });
             features.description = features.description || extractedFeatures.description;
             features.tags = features.tags.length > 0 ? features.tags : extractedFeatures.tags;
 
@@ -227,7 +230,10 @@ export class SyncController {
           if (githubContent) {
             skill.content = githubContent.skillMd;
             skill.files = githubContent.files;
-            const extractedFeatures = this.extractor.extract(githubContent.skillMd);
+            const extractedFeatures = this.extractor.extract(githubContent.skillMd, {
+              owner: features.owner,
+              maxTags: 5,
+            });
             features.description = features.description || extractedFeatures.description;
             features.tags = features.tags.length > 0 ? features.tags : extractedFeatures.tags;
 

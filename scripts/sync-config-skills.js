@@ -134,7 +134,9 @@ async function main() {
   validSkills.forEach(name => console.log(`   • ${name}`));
   console.log();
 
-  const controller = new SyncController(CONFIG);
+  const controller = new SyncController(CONFIG, {
+    nonInteractive: options.autoSelect === true,
+  });
 
   try {
     const results = await controller.syncByNames(validSkills, {

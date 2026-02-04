@@ -38,6 +38,11 @@ async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
     }
   }
 
+  // 如果所有重试都失败，抛出错误
+  // 如果 lastError 为 undefined（所有重试都是 403/429 但没有触发 catch），创建一个新的错误
+  if (!lastError) {
+    throw new Error('GitHub API 速率限制，请配置 GITHUB_TOKEN 以提高限额 (60次/小时 -> 5000次/小时)');
+  }
   throw lastError;
 }
 
@@ -139,8 +144,9 @@ export async function fetchGithubContent(features) {
           }
         } catch (error) {
           // 继续尝试下一个路径或分支
-          if (error.message && !error.message.includes('fetch failed')) {
-            console.log(`  ⚠️ 获取 SKILL.md 失败: ${error.message}`);
+          const errorMsg = error?.message || String(error);
+          if (!errorMsg.includes('fetch failed')) {
+            console.log(`  ⚠️ 获取 SKILL.md 失败: ${errorMsg}`);
           }
         }
       }
@@ -280,13 +286,15 @@ export async function fetchGithubContent(features) {
           }
         }
       } catch (error) {
-        console.log(`  ⚠️ 获取目录内容失败: ${error.message}`);
+        const errorMsg = error?.message || String(error);
+        console.log(`  ⚠️ 获取目录内容失败: ${errorMsg}`);
       }
     }
 
     return { skillMd, files };
   } catch (error) {
-    console.log(`  ⚠️ 无法获取 GitHub 内容: ${error.message}`);
+    const errorMsg = error?.message || String(error);
+    console.log(`  ⚠️ 无法获取 GitHub 内容: ${errorMsg}`);
     return null;
   }
 }
